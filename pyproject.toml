@@ -10,8 +10,10 @@ dependencies = [
     "httpx>=0.28.1",
     "ipykernel>=6.29.5",
     "mistralai>=1.9.2",
+    "pandas>=2.0.0",
     "pytest>=8.4.1",
     "python-dotenv>=1.1.1",
     "python-levenshtein>=0.27.1",
     "python-multipart>=0.0.20",
+    "streamlit>=1.47.0",
 ]
