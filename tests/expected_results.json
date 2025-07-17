@@ -1,0 +1,88 @@
+{
+  "results": [
+    {
+      "start_date": "2022-06-30",
+      "end_date": "2022-07-31",
+      "consumption": 1969.94,
+      "current_bill": 8889.67
+    },
+    {
+      "start_date": "2022-07-31",
+      "end_date": "2022-08-31",
+      "consumption": 2354.46,
+      "current_bill": 10554.34
+    },
+    {
+      "start_date": "2022-08-31",
+      "end_date": "2022-09-30",
+      "consumption": 2589.86,
+      "current_bill": 11609.56
+    },
+    {
+      "start_date": "2022-09-30",
+      "end_date": "2022-10-31",
+      "consumption": 2241.52,
+      "current_bill": 10048.07
+    },
+    {
+      "start_date": "2022-10-31",
+      "end_date": "2022-11-30",
+      "consumption": 2046.21,
+      "current_bill": 9172.54
+    },
+    {
+      "start_date": "2022-11-30",
+      "end_date": "2022-12-31",
+      "consumption": 2237.92,
+      "current_bill": 10031.93
+    },
+    {
+      "start_date": "2022-12-31",
+      "end_date": "2023-01-31",
+      "consumption": 2425.75,
+      "current_bill": 11199.93
+    },
+    {
+      "start_date": "2023-01-31",
+      "end_date": "2023-03-01",
+      "consumption": 2268.89,
+      "current_bill": 10475.69
+    },
+    {
+      "start_date": "2023-03-01",
+      "end_date": "2023-03-31",
+      "consumption": 2179.14,
+      "current_bill": 10061.31
+    },
+    {
+      "start_date": "2023-03-31",
+      "end_date": "2023-04-30",
+      "consumption": 2204.24,
+      "current_bill": 10177.19
+    },
+    {
+      "start_date": "2023-04-30",
+      "end_date": "2023-05-31",
+      "consumption": 2438.75,
+      "current_bill": 11259.95
+    },
+    {
+      "start_date": "2023-05-31",
+      "end_date": "2023-06-30",
+      "consumption": 2458.34,
+      "current_bill": 11350.4
+    },
+    {
+      "start_date": "2023-06-30",
+      "end_date": "2023-07-31",
+      "consumption": 2325.73,
+      "current_bill": 10738.13
+    },
+    {
+      "start_date": "2023-07-31",
+      "end_date": "2023-08-31",
+      "consumption": 2292.09,
+      "current_bill": 10582.81
+    }
+  ]
+}
