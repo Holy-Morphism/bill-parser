@@ -1,3 +1,4 @@
+from altair.vegalite.v5.schema.channels import Description
 from typing import Optional
 import base64
 from dotenv import load_dotenv
@@ -39,6 +40,7 @@ class Bill(BaseModel):
         ..., description="The total current bill of water, e.g. $10,475.69 "
     )
     sewage: Optional[float] = Field(None, description="The sewage amount if available")
+    bill_no: str = Field(...,description="The serial number of the bill")
 
 
 def extract_data(bill: bytes):
