@@ -4,6 +4,10 @@ from typing import List
 import streamlit as st
 import pandas as pd
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # API configuration
 API_URL = os.environ["API_URL"]
