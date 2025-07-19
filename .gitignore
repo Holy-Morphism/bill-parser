@@ -14,3 +14,8 @@ data
 tests
 test*.py
 .pytest_cache
+
+entities.py 
+extract_merged.py
+extract_single.py
+extraction.py

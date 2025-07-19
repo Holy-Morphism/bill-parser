@@ -1,14 +1,19 @@
-from importlib.resources._functional import contents
-from typing import List
+from typing_extensions import Literal
+from typing import Optional, List
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from extraction import extract_data
+import concurrent.futures
+from extract_single_bill import extract_single_bills
 
 app = FastAPI()
 
 
 @app.post("/extract-bills")
-async def extract_batch(bills: List[UploadFile] = File(...)):
+async def extract_batch(
+    bills: List[UploadFile] = File(...),
+    mode: Optional[Literal["merged", "single"]] = None,
+):
     results = []
+    contents = []
 
     for bill in bills:
         # Check if file is a PDF
@@ -31,7 +36,15 @@ async def extract_batch(bills: List[UploadFile] = File(...)):
 
         content = await bill.read()
 
-        results.append(extract_data(content))
+        contents.append(content)
 
-  
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        futures = [pool.submit(extract_single_bills, content) for content in contents]
+
+        for future in concurrent.futures.as_completed(futures):
+            result = future.result()  # this gets the return value of the worker
+            results.append(result)
+    
+    
+
     return {"results": results}
