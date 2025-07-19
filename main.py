@@ -7,6 +7,18 @@ from extract_single_bill import extract_single_bills
 app = FastAPI()
 
 
+@app.get("/")
+async def root():
+    return {
+        "message": "Welcome to Bill Parser API",
+        "status": "running",
+        "endpoints": {
+            "extract_bills": "/extract-bills",
+            "docs": "/docs",
+            "health": "/health"
+        }
+    }
+
 @app.post("/extract-bills")
 async def extract_batch(
     bills: List[UploadFile] = File(...),
