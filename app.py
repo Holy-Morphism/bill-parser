@@ -42,7 +42,7 @@ with col1:
             )
 
             if response.status_code == 200:
-                api_results = response.json()["results"]
+                api_results = response.json()["bills"]
 
                 print(api_results)
 
@@ -60,22 +60,22 @@ with col1:
                     zip(uploaded_files, api_results)
                 ):
 
-                    data = json.loads(result)
+                    data = result
 
                     file_name.append(uploaded_file.name)
                     bill_no.append(data["bill_no"])
                     start_date.append(
-                        f"{data['previous_date']['day']:02d}-{data['previous_date']['month']:02d}-{data['previous_date']['year']}"
+                        f"{data['start_date']['day']:02d}-{data['start_date']['month']:02d}-{data['start_date']['year']}"
                     )
                     end_date.append(
-                        f"{data['current_date']['day']:02d}-{data['current_date']['month']:02d}-{data['current_date']['year']}"
+                        f"{data['end_date']['day']:02d}-{data['end_date']['month']:02d}-{data['end_date']['year']}"
                     )
-                    usage.append(f"{data['consumption']} m³")
-                    water.append(f"{data['total_bill']}")
+                    usage.append(f"{data['usage']} m³")
+                    water.append(f"{data['water']}")
 
                     sewage_no = data["sewage"] if data["sewage"] else 0
                     sewage.append(sewage_no)
-                    bill_amount.append(float(data["total_bill"]) + float(sewage_no))
+                    bill_amount.append(data["bill_amount"])
 
                     progress_bar.progress((i + 1) / len(uploaded_files))
 
