@@ -25,7 +25,6 @@ uploaded_files = st.file_uploader(
 
 if uploaded_files:
 
-
     # Prepare files for API call
     files = []
     for uploaded_file in uploaded_files:
@@ -39,6 +38,7 @@ if uploaded_files:
     )
 
     api_results = response.json()["bills"]
+    address = response.json()["address"]
 
     # Print results without image data for debugging
     for i, result in enumerate(api_results):
@@ -49,9 +49,10 @@ if uploaded_files:
             )
         print(f"Bill {i+1}:", result_copy)
 
+    st.write(f"**Address** {address}")
+
     # Process and display results one by one as expanders
-    for i, data in enumerate( api_results):
-      
+    for i, data in enumerate(api_results):
 
         # Format dates
         start_date = f"{data['start_date']['day']:02d}-{data['start_date']['month']:02d}-{data['start_date']['year']}"
@@ -84,6 +85,3 @@ if uploaded_files:
                     )
                 else:
                     st.info("No image available for this bill")
-
-
-   
