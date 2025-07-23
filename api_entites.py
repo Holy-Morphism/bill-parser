@@ -25,6 +25,7 @@ class BillData(BaseModel):
     water: float = Field(..., description="Water charges amount")
     sewage: Optional[float] = Field(None, description="Sewage charges (if applicable)")
     bill_amount: float = Field(..., description="Total bill amount")
+    image: Optional[str] = Field(None, description="Bill image in base64 format")
 
     class Config:
         json_schema_extra = {
@@ -37,6 +38,7 @@ class BillData(BaseModel):
                 "water": 45.20,
                 "sewage": 12.30,
                 "bill_amount": 57.50,
+                "image":"..."
             }
         }
 

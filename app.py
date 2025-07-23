@@ -5,6 +5,8 @@ import streamlit as st
 import pandas as pd
 import os
 from dotenv import load_dotenv
+import base64
+from io import BytesIO
 
 # Load environment variables from .env file
 load_dotenv()
@@ -16,98 +18,72 @@ st.set_page_config(page_title="Bill Parser", page_icon="📄", layout="wide")
 st.title("📄 Water Bill Data Extractor")
 st.markdown("Upload your water bill PDFs to extract key information automatically.")
 
-col1, col2 = st.columns(2)
+# Single column layout
+uploaded_files = st.file_uploader(
+    "Upload Bills", accept_multiple_files=True, type="pdf"
+)
 
-with col1:
-    uploaded_files = st.file_uploader(
-        "Upload Bills", accept_multiple_files=True, type="pdf"
+if uploaded_files:
+
+
+    # Prepare files for API call
+    files = []
+    for uploaded_file in uploaded_files:
+        files.append(
+            ("bills", (uploaded_file.name, uploaded_file.read(), "application/pdf"))
+        )
+
+    # Call the API
+    response = requests.post(
+        API_URL, files=files, params={"mode": "single"}  # or "merged"
     )
 
-    if uploaded_files:
-        progress_bar = st.progress(0)
-        status_text = st.empty()
+    api_results = response.json()["bills"]
 
-        # Prepare files for API call
-        files = []
-        for uploaded_file in uploaded_files:
-            files.append(
-                ("bills", (uploaded_file.name, uploaded_file.read(), "application/pdf"))
+    # Print results without image data for debugging
+    for i, result in enumerate(api_results):
+        result_copy = result.copy()
+        if "image" in result_copy:
+            result_copy["image"] = (
+                "[BASE64_IMAGE_DATA]" if result_copy["image"] else None
             )
+        print(f"Bill {i+1}:", result_copy)
 
-        try:
-            # Call the API
-            status_text.text("Processing all files...")
-            response = requests.post(
-                API_URL, files=files, params={"mode": "single"}  # or "merged"
-            )
+    # Process and display results one by one as expanders
+    for i, data in enumerate( api_results):
+      
 
-            if response.status_code == 200:
-                api_results = response.json()["bills"]
+        # Format dates
+        start_date = f"{data['start_date']['day']:02d}-{data['start_date']['month']:02d}-{data['start_date']['year']}"
+        end_date = f"{data['end_date']['day']:02d}-{data['end_date']['month']:02d}-{data['end_date']['year']}"
+        usage = f"{data['usage']} m³"
+        water = f"{data['water']}"
+        sewage = data["sewage"] if data["sewage"] else 0
+        bill_amount = data["bill_amount"]
 
-                print(api_results)
+        # Create expander for this bill
+        with st.expander(f"📄 {uploaded_file.name} - Bill #{data['bill_no']}"):
+            col_info, col_img = st.columns([1, 2])
 
-                # Process results
-                file_name = []
-                bill_no = []
-                start_date = []
-                end_date = []
-                usage = []
-                water = []
-                sewage = []
-                bill_amount = []
+            with col_info:
+                st.write(f"**Bill No:** {data['bill_no']}")
+                st.write(f"**Period:** {start_date} to {end_date}")
+                st.write(f"**Usage:** {usage}")
+                st.write(f"**Water:** ${water}")
+                st.write(f"**Sewage:** ${sewage}")
+                st.write(f"**Total Amount:** ${bill_amount}")
 
-                for i, (uploaded_file, result) in enumerate(
-                    zip(uploaded_files, api_results)
-                ):
-
-                    data = result
-
-                    file_name.append(uploaded_file.name)
-                    bill_no.append(data["bill_no"])
-                    start_date.append(
-                        f"{data['start_date']['day']:02d}-{data['start_date']['month']:02d}-{data['start_date']['year']}"
+            with col_img:
+                if "image" in data and data["image"]:
+                    # Decode base64 image and display
+                    image_data = base64.b64decode(data["image"])
+                    st.image(
+                        image_data,
+                        caption=f"Bill Image - {uploaded_file.name}",
+                        use_container_width=True,
                     )
-                    end_date.append(
-                        f"{data['end_date']['day']:02d}-{data['end_date']['month']:02d}-{data['end_date']['year']}"
-                    )
-                    usage.append(f"{data['usage']} m³")
-                    water.append(f"{data['water']}")
+                else:
+                    st.info("No image available for this bill")
 
-                    sewage_no = data["sewage"] if data["sewage"] else 0
-                    sewage.append(sewage_no)
-                    bill_amount.append(data["bill_amount"])
 
-                    progress_bar.progress((i + 1) / len(uploaded_files))
-
-                df = pd.DataFrame(
-                    {
-                        "File name": file_name,
-                        "Bill No": bill_no,
-                        "Start Date": start_date,
-                        "End Date": end_date,
-                        "Usage": usage,
-                        "Water": water,
-                        "Sewage": sewage,
-                        "Bill Amount": bill_amount,
-                    }
-                )
-
-                st.session_state["results"] = df
-                status_text.text("✅ Processing complete!")
-
-            else:
-                st.error(f"API Error: {response.status_code} - {response.text}")
-
-        except requests.exceptions.ConnectionError:
-            st.error(
-                "❌ Cannot connect to API. Make sure the FastAPI server is running."
-            )
-        except Exception as e:
-            st.error(f"❌ Error: {str(e)}")
-        finally:
-            progress_bar.empty()
-            status_text.empty()
-
-with col2:
-    if st.session_state.get("results") is not None:
-        st.table(st.session_state["results"])
+   

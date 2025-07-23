@@ -15,6 +15,9 @@ class Date(BaseModel):
 
 
 class Bill(BaseModel):
+    page_no: int = Field(
+        ..., description="The page number from which this infromation was extracted. "
+    )
     previous_date: Date = Field(
         ..., description="The previous date of the bill reading e.g. 2022-06-30"
     )
@@ -32,9 +35,4 @@ class Bill(BaseModel):
 
 
 class Bills(BaseModel):
-    addrress: str = Field(..., description="The address of location of the bills")
     bills: List[Bill] = Field(..., description="The list of bills")
-
-
-class BillAddresss(BaseModel):
-    address:str

@@ -1,3 +1,4 @@
+from workflow import process_bill_pdf
 from api_entites import (
     ExtractResponse,
     RootResponse,
@@ -7,9 +8,6 @@ from api_entites import (
 from typing_extensions import Literal
 from typing import Optional, List
 from fastapi import FastAPI, UploadFile, File, HTTPException, Query
-from pydantic import BaseModel
-import concurrent.futures
-from extract_single_bill import extract_single_bill, extract_address
 import os
 
 
@@ -174,8 +172,8 @@ async def extract_batch(
         }
         ```
     """
-    results = []
-    contents = []
+    all_bills = []
+    address = None
 
     for bill in bills:
         # Check if file is a PDF
@@ -198,20 +196,14 @@ async def extract_batch(
 
         content = await bill.read()
 
-        contents.append((bill.filename, content))
+        address, result = process_bill_pdf(content, bill.filename)
+            
+        # Add bills to the list
+        all_bills.extend(result)
 
+            
 
-    # Limit to 4 workers for optimal performance
-    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
-        futures = [
-            pool.submit(extract_single_bill, file_name, content)
-            for file_name, content in contents
-        ]
-
-        for future in concurrent.futures.as_completed(futures):
-            result = future.result()  # this gets the return value of the worker
-            results.append(result)
-
-    address = extract_address(contents[0][1])
-
-    return {"address": address, "bills": results}
+    return ExtractResponse(
+        address=address or "Address not found",
+        bills=all_bills
+    )
