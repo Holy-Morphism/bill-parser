@@ -10,9 +10,9 @@ wheels/
 .venv
 .env*
 
-data
-tests
+
+/tests
 test*.py
 .pytest_cache
-
+/.vscode
 main.ipynb
