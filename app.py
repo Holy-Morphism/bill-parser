@@ -67,6 +67,7 @@ if uploaded_files:
             col_info, col_img = st.columns([1, 2])
 
             with col_info:
+                st.write(f"**Extracted Bill No.:** {i+1}")
                 st.write(f"**Bill No:** {data['bill_no']}")
                 st.write(f"**Period:** {start_date} to {end_date}")
                 st.write(f"**Usage:** {usage}")

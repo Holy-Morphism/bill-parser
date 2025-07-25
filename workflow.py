@@ -66,19 +66,30 @@ def extract_content(state: State):
         },
     )
 
-    content = "".join(
-        [
-            f"\n\nPAGE NUMBER :{page.index}\n{page.markdown}"
-            for page in ocr_response.pages
-        ]
-    )
+    # content = "".join(
+    #     [
+    #         f"\n\nPAGE NUMBER :{page.index}\n{page.markdown}"
+    #         for page in ocr_response.pages
+    #     ]
+    # )
+
+    content = ""
+
+    for page in ocr_response.pages:
+        content += f"\n\nPAGE NUMBER :{page.index}\n{page.markdown}"
+
+
+        for image in page.images:
+
+            if image.id and image.image_annotation:
+                content.replace(image.id,image.image_annotation)
 
     return {**state, "content": content}
 
 
 def check_multiple_bills(state: State):
     response = google_client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.5-flash-lite",
         contents=types.Part.from_text(text=state["content"]),
         config=types.GenerateContentConfig(
             system_instruction="""Analyze this water bill content for multiple billing periods. 
@@ -103,7 +114,7 @@ def check_multiple_bills(state: State):
         ),
     )
 
-    response_data = json.loads(response.text)
+    response_data = json.loads(response.text or "")
 
     return {
         **state,
@@ -119,7 +130,7 @@ def is_multiple_bills(state: State) -> Literal["single_bill", "multiple_bills"]:
 def single_bill(state: State):
 
     response = google_client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.5-flash-lite",
         contents=types.Part.from_text(text=state["content"]),
         config=types.GenerateContentConfig(
             system_instruction="You are an expert information extractor. Your job is to extract bill information given the provided schema",
@@ -136,7 +147,7 @@ def single_bill(state: State):
         ),
     )
 
-    bill_data = json.loads(response.text)
+    bill_data = json.loads(response.text or "")
     bill = Bill(**bill_data)
 
     return {**state, "bills": [bill]}
@@ -162,7 +173,7 @@ def multiple_bills(state: State):
         ),
     )
 
-    bills_data = json.loads(response.text)
+    bills_data = json.loads(response.text or "")
     bills = []
     
     for bill_data in bills_data["bills"]:

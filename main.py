@@ -10,6 +10,8 @@ from typing import Optional, List
 from fastapi import FastAPI, UploadFile, File, HTTPException, Query
 import os
 
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI(
     title="Bill Parser API",
@@ -58,6 +60,15 @@ app = FastAPI(
         },
     ],
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or specify your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 
 @app.get("/", response_model=RootResponse, tags=["info"])
@@ -196,7 +207,7 @@ async def extract_batch(
 
         content = await bill.read()
 
-        address, result = process_bill_pdf(content, bill.filename)
+        address, result = process_bill_pdf(content, bill.filename or "")
             
         # Add bills to the list
         all_bills.extend(result)
