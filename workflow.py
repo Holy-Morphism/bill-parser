@@ -90,7 +90,18 @@ def extract_content(state: State):
 def check_multiple_bills(state: State):
     response = google_client.models.generate_content(
         model="gemini-2.5-flash-lite",
-        contents=types.Part.from_text(text=state["content"]),
+        contents=types.Part.from_text(text=f"""
+        The following information should be present together, only then you can extract them:
+        1. Please look for current reading date.
+        2. Please look for previous reading date.
+        3. Please look for sewage cost. 
+        4. Please look for water cost.
+        5. Please for total bill. 
+        The cost of water plus sewage should be equal to the total bill.
+        water + sewage = total bill
+        If you find this information together on a certain page, then you must also extract that certain page number.
+        YOUR LIFE DEPENDS ON THIS!
+        {state["content"]}"""),
         config=types.GenerateContentConfig(
             system_instruction="""Analyze this water bill content for multiple billing periods. 
                                     Key indicators of multiple bills:
